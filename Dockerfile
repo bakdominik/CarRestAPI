@@ -19,9 +19,9 @@ COPY . .
 # collect static files
 RUN python manage.py collectstatic --noinput
 
-# add and run as non-root user
-RUN adduser myuser
-USER myuser
+# # add and run as non-root user
+# RUN adduser myuser
+# USER myuser
 
 # run gunicorn
 CMD gunicorn core.wsgi:application --bind 0.0.0.0:$PORT
