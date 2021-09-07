@@ -26,13 +26,14 @@ def cars(request,pk=None):
             return Response(car_serializer.data, status=status.HTTP_201_CREATED) 
         return Response(car_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
-        try: 
-            car = Car.objects.get(pk=pk) 
-        except Car.DoesNotExist: 
-            return Response({'message': 'The car does not exist'}, status=status.HTTP_404_NOT_FOUND)
-        car.delete()
-        return Response({'message': 'Car was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+@api_view(['DELETE'])
+def car_delete(request,pk):
+    try: 
+        car = Car.objects.get(pk=pk) 
+    except Car.DoesNotExist: 
+        return Response({'message': 'The car does not exist'}, status=status.HTTP_404_NOT_FOUND)
+    car.delete()
+    return Response({'message': 'Car was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['POST'])

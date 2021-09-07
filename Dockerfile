@@ -1,15 +1,27 @@
 # syntax=docker/dockerfile:1
-FROM python:3.9
+FROM python:3.9.7-slim-buster
 WORKDIR /app
 
-# install psycopg2
-RUN apk update \
-    && apk add --virtual build-deps gcc python3-dev musl-dev \
-    && apk add postgresql-dev \
-    && pip install psycopg2 \
-    && apk del build-deps
-    
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBUG 0
+
+# install dependencies
+COPY requirements.txt /app/
+RUN set -ex \
+    && pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+# copy project
 COPY . .
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# collect static files
+RUN python manage.py collectstatic --noinput
+
+# add and run as non-root user
+RUN adduser myuser
+USER myuser
+
+# run gunicorn
+CMD gunicorn core.wsgi:application --bind 0.0.0.0:$PORT

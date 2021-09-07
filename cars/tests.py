@@ -51,14 +51,13 @@ class DeleteCarTestCase(APITestCase):
         response = self.client.delete("/cars/110/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
 class RateCarTestCase(APITestCase):
 
     def setUp(self):
         self.golf = Car.objects.create(make='Volkswagen',model='Golf')
     
     def test_car_rate(self):
-        data = {"car_id": 1, "rating": 5}
+        data = {"car_id": self.golf.id, "rating": 5}
         response = self.client.post("/rate/", data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -92,12 +91,11 @@ class CarListsTestCase(APITestCase):
     def test_popular_car_list(self):
         response = self.client.get("/popular/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(dict(response.data[0]), {"id": 1,"make": "Volkswagen", "model": "Golf", "rates_number": 20})
-        self.assertEqual(dict(response.data[1]), {"id": 2,"make": "Volkswagen", "model": "Passat", "rates_number": 15})
+        self.assertEqual(dict(response.data[0]), {"id": self.golf.id,"make": "Volkswagen", "model": "Golf", "rates_number": 20})
+        self.assertEqual(dict(response.data[1]), {"id": self.passat.id,"make": "Volkswagen", "model": "Passat", "rates_number": 15})
 
     def test_car_list(self):
         response = self.client.get("/cars/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(dict(response.data[1]), {"id": 2,"make": "Volkswagen", "model": "Passat", "avg_rating": 3.0})
-        self.assertEqual(dict(response.data[0]), {"id": 1,"make": "Volkswagen", "model": "Golf", "avg_rating": 5.0})
-        
+        self.assertEqual(dict(response.data[1]), {"id": 1,"make": "Volkswagen", "model": "Golf", "avg_rating": 5.0})
+        self.assertEqual(dict(response.data[0]), {"id": 2,"make": "Volkswagen", "model": "Passat", "avg_rating": 3.0})
